@@ -2,7 +2,7 @@
 
 CacheHierarchy::CacheHierarchy() = default;
 
-void CacheHierarchy::set_levels(const std::vector<CacheConfig> &level_configs) {
+void CacheHierarchy::set_levels(const vector<CacheConfig> &level_configs) {
   levels.clear();
   levels.reserve(level_configs.size());
   for (const auto &cfg : level_configs) {
@@ -27,8 +27,8 @@ void CacheHierarchy::access(size_t address) {
   }
 }
 
-std::vector<CacheStats> CacheHierarchy::get_stats() const {
-  std::vector<CacheStats> out;
+vector<CacheStats> CacheHierarchy::get_stats() const {
+  vector<CacheStats> out;
   out.reserve(levels.size());
   for (const auto &level : levels) {
     out.push_back(level.get_stats());

@@ -21,7 +21,11 @@ enum class CommandType {
   STATS,
   CACHE_INIT,
   CACHE_ACCESS,
-  CACHE_STATS
+  CACHE_STATS,
+  VM_INIT,
+  VM_ACCESS,
+  VM_STATS,
+  HELP
 };
 
 struct Command {
@@ -34,6 +38,7 @@ struct Command {
 class CommandParser {
 public:
   static Command parse(const string &input);
+  static void print_help();
 
 private:
   static vector<string> tokenize(const string &input);
@@ -50,8 +55,8 @@ public:
 private:
   MemoryAllocator *allocator;
   BuddyAllocator *buddy_allocator;
-  bool initialized;
   bool use_buddy;
+  bool initialized;
 
   CacheHierarchy cache_hierarchy;
   bool cache_initialized;
@@ -70,8 +75,8 @@ private:
   void handle_cache_access(const vector<string> &args);
   void handle_cache_stats();
 
-  void handle_vm_init(const std::vector<std::string> &args);
-  void handle_vm_access(const std::vector<std::string> &args);
+  void handle_vm_init(const vector<string> &args);
+  void handle_vm_access(const vector<string> &args);
   void handle_vm_stats();
 };
 

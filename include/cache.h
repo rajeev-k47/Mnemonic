@@ -5,15 +5,16 @@
 #include <string>
 #include <vector>
 
+using namespace std;
 enum class ReplacementPolicy { FIFO, LRU, LFU };
 
 struct CacheStats {
-  std::string level_name;
+  string level_name;
   size_t accesses;
   size_t hits;
   size_t misses;
 
-  CacheStats(const std::string &name = "")
+  CacheStats(const string &name = "")
       : level_name(name), accesses(0), hits(0), misses(0) {}
 
   double hit_ratio() const {
@@ -22,13 +23,13 @@ struct CacheStats {
 };
 
 struct CacheConfig {
-  std::string name;
+  string name;
   size_t size_bytes;
   size_t block_size;
   size_t associativity;
   ReplacementPolicy policy;
 
-  CacheConfig(const std::string &n = "", size_t size = 0, size_t block = 0,
+  CacheConfig(const string &n = "", size_t size = 0, size_t block = 0,
               size_t assoc = 1, ReplacementPolicy p = ReplacementPolicy::FIFO)
       : name(n), size_bytes(size), block_size(block), associativity(assoc),
         policy(p) {}
@@ -64,7 +65,7 @@ private:
   size_t num_sets;
   size_t global_time;
 
-  std::vector<std::vector<CacheLine>> sets;
+  vector<vector<CacheLine>> sets;
 
   size_t get_set_index(size_t address) const;
   size_t get_tag(size_t address) const;
@@ -77,14 +78,14 @@ class CacheHierarchy {
 public:
   CacheHierarchy();
 
-  void set_levels(const std::vector<CacheConfig> &level_configs);
+  void set_levels(const vector<CacheConfig> &level_configs);
   void access(size_t address);
-  std::vector<CacheStats> get_stats() const;
+  vector<CacheStats> get_stats() const;
   void reset();
   bool empty() const { return levels.empty(); }
 
 private:
-  std::vector<CacheLevel> levels;
+  vector<CacheLevel> levels;
 };
 
 #endif

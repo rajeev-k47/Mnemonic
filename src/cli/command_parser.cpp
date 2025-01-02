@@ -8,7 +8,8 @@ using namespace std;
 
 CLI::CLI()
     : allocator(nullptr), buddy_allocator(nullptr), use_buddy(false),
-      initialized(false) {}
+      initialized(false), cache_hierarchy(), cache_initialized(false),
+      vm_manager(), vm_initialized(false) {}
 
 CLI::~CLI() {
   if (allocator) {
@@ -54,7 +55,14 @@ CommandType CommandParser::get_command_type(const string &cmd) {
     return CommandType::CACHE_ACCESS;
   if (lower_cmd == "cache_stats")
     return CommandType::CACHE_STATS;
-
+  if (lower_cmd == "vm_init")
+    return CommandType::VM_INIT;
+  if (lower_cmd == "vm_access")
+    return CommandType::VM_ACCESS;
+  if (lower_cmd == "vm_stats")
+    return CommandType::VM_STATS;
+  if (lower_cmd == "help")
+    return CommandType::HELP;
   return CommandType::UNKNOWN;
 }
 
@@ -74,7 +82,29 @@ Command CommandParser::parse(const string &input) {
 
   return cmd;
 }
-
+void CommandParser::print_help() {
+  std::cout << "\n~~~~~~MNEMONIC Commands~~~~~" << std::endl;
+  std::cout << "init memory <size>" << std::endl;
+  std::cout << "set allocator <type>" << std::endl;
+  std::cout << "malloc <size>" << std::endl;
+  std::cout << "free <block_id>" << std::endl;
+  std::cout << "dump" << std::endl;
+  std::cout << "stats" << std::endl;
+  std::cout << "cache_init <L1_size> <L1_block> <L1_assoc> [L2_size L2_block "
+               "L2_assoc]"
+            << std::endl;
+  std::cout
+      << "                            - Configure 1- or 2-level cache hierarchy"
+      << std::endl;
+  std::cout << "cache_access <address>" << std::endl;
+  std::cout << "cache_stats" << std::endl;
+  std::cout << "vm_init <vsize> <page> <psize>" << std::endl;
+  std::cout << "vm_access <vaddr>" << std::endl;
+  std::cout << "vm_stats" << std::endl;
+  std::cout << "help" << std::endl;
+  std::cout << "exit" << std::endl;
+  std::cout << std::endl;
+}
 void CLI::run() {
   cout << "~~~MNEMONIC~~~" << endl;
 

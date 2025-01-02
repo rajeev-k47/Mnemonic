@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <iostream>
 
+using namespace std;
+
 BestFitAllocator::BestFitAllocator() { allocator_name = "Best Fit"; }
 
 MemoryBlock *BestFitAllocator::find_free_block(size_t size) {
@@ -61,10 +63,9 @@ AllocationResult BestFitAllocator::allocate(size_t size) {
   stats.num_allocations++;
   stats.num_allocated_blocks++;
 
-  std::cout << "I[Allocator] Allocated block id=" << block_id
-            << " at address=0x" << std::hex << std::setw(4) << std::setfill('0')
-            << allocated_block->address << std::dec << " (size=" << size << ")"
-            << std::endl;
+  cout << "I[Allocator] Allocated block id=" << block_id << " at address=0x"
+       << hex << setw(4) << setfill('0') << allocated_block->address << dec
+       << " (size=" << size << ")" << endl;
 
   return AllocationResult(true, block_id, allocated_block->address, "Success");
 }

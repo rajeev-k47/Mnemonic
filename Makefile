@@ -16,6 +16,7 @@ SOURCES = $(SRC_DIR)/main.cpp \
 					$(SRC_DIR)/cli/handlers.cpp \
           $(SRC_DIR)/buddy/buddy_allocator.cpp \
 					$(SRC_DIR)/cache/cache.cpp \
+					$(SRC_DIR)/vm/vm_manager.cpp \
 					$(SRC_DIR)/cache/cache_heirarchy.cpp
 
 
@@ -23,8 +24,10 @@ OBJECTS = $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 all: $(TARGET)
 
-$(OBJ_DIR): 
+$(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
+	mkdir -p $(OBJ_DIR)/allocator
+	mkdir -p $(OBJ_DIR)/cli
 
 $(TARGET): $(OBJ_DIR) $(OBJECTS)
 	$(CXX) $(OBJECTS) -o $(TARGET)
