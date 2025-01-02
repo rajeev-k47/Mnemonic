@@ -158,7 +158,18 @@ void CLI::execute_command(const Command &cmd) {
   case CommandType::CACHE_STATS:
     handle_cache_stats();
     break;
-
+  case CommandType::VM_INIT:
+    handle_vm_init(cmd.args);
+    break;
+  case CommandType::VM_ACCESS:
+    handle_vm_access(cmd.args);
+    break;
+  case CommandType::VM_STATS:
+    handle_vm_stats();
+    break;
+  case CommandType::HELP:
+    CommandParser::print_help();
+    break;
   case CommandType::UNKNOWN:
     cerr << "[W] Unknown command" << endl;
     break;
