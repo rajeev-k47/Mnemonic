@@ -1,3 +1,7 @@
+#include "../include/cli.h"
+
 int main() { 
-  return 0; 
+  CLI cli;
+  cli.run();
+  return 0;
 }

@@ -7,7 +7,8 @@ BIN_DIR = .
 
 TARGET = $(BIN_DIR)/mnemonic
 
-SOURCES = $(SRC_DIR)/main.cpp
+SOURCES = $(SRC_DIR)/main.cpp \
+					$(SRC_DIR)/cli/command_parser.cpp
 
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
