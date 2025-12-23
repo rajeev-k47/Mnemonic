@@ -159,3 +159,75 @@ bool MemoryAllocator::deallocate(size_t block_id) {
   update_stats();
   return true;
 }
+
+void MemoryAllocator::update_stats() { calculate_fragmentation(); }
+
+void MemoryAllocator::calculate_fragmentation() {
+  size_t largest_free_block = 0;
+  MemoryBlock *current = free_list_head;
+
+  while (current) {
+    if (current->size > largest_free_block) {
+      largest_free_block = current->size;
+    }
+    current = current->next;
+  }
+
+  if (stats.free_memory > 0) {
+    stats.external_fragmentation =
+        (1.0 - (double)largest_free_block / stats.free_memory) * 100.0;
+  } else {
+    stats.external_fragmentation = 0.0;
+  }
+
+  stats.internal_fragmentation = 0.0;
+}
+
+AllocationStats MemoryAllocator::get_stats() {
+  update_stats();
+  return stats;
+}
+
+void MemoryAllocator::dump_memory() {
+  cout << "\n~~~~~Memory Dump~~~~~~" << endl;
+
+  vector<MemoryBlock *> all_blocks;
+
+  MemoryBlock *free_block = free_list_head;
+  while (free_block) {
+    all_blocks.push_back(free_block);
+    free_block = free_block->next;
+  }
+
+  for (size_t i = 0; i < allocated_blocks.size(); i++) {
+    if (allocated_blocks[i] && allocated_blocks[i]->allocated) {
+      all_blocks.push_back(allocated_blocks[i]);
+    }
+  }
+
+  sort(all_blocks.begin(), all_blocks.end(),
+       [](MemoryBlock *a, MemoryBlock *b) { return a->address < b->address; });
+
+  for (auto block : all_blocks) {
+    cout << "[0x" << hex << setw(4) << setfill('0') << block->address << " - 0x"
+         << setw(4) << setfill('0') << (block->address + block->size - 1)
+         << "] ";
+
+    if (block->allocated) {
+      size_t block_id = 0;
+      for (size_t i = 0; i < allocated_blocks.size(); i++) {
+        if (allocated_blocks[i] == block) {
+          block_id = i + 1;
+          break;
+        }
+      }
+      cout << "I[Allocator] USED (id=" << dec << block_id
+           << ", size=" << block->size << ")";
+    } else {
+      cout << "I[Allocator] FREE (size=" << dec << block->size << ")";
+    }
+    cout << endl;
+  }
+
+  cout << dec << endl;
+}
