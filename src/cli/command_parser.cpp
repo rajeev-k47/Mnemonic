@@ -79,8 +79,33 @@ void CLI::run() {
       break;
     }
 
-    // execute_command(cmd);
-    cout << input << endl;
+    execute_command(cmd);
   }
 }
-void CLI::execute_command(const Command &cmd) {}
+void CLI::execute_command(const Command &cmd) {
+  switch (cmd.type) {
+  case CommandType::INIT:
+    handle_init(cmd.args);
+    break;
+  case CommandType::SET_ALLOCATOR:
+    handle_set_allocator(cmd.args);
+    break;
+  case CommandType::MALLOC:
+    handle_malloc(cmd.args);
+    break;
+  case CommandType::FREE:
+    handle_free(cmd.args);
+    break;
+  case CommandType::DUMP:
+    handle_dump();
+    break;
+  case CommandType::STATS:
+    handle_stats();
+    break;
+  case CommandType::UNKNOWN:
+    cerr << "[W] Unknown command" << endl;
+    break;
+  default:
+    break;
+  }
+}
