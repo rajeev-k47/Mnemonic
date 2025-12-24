@@ -43,6 +43,7 @@ public:
 
 private:
   MemoryAllocator *allocator;
+  bool initialized;
 
   void handle_init(const vector<string> &args);
   void handle_set_allocator(const vector<string> &args);
