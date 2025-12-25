@@ -82,4 +82,31 @@ protected:
   virtual MemoryBlock *find_free_block(size_t size) = 0;
 };
 
+class FirstFitAllocator : public MemoryAllocator {
+public:
+  FirstFitAllocator();
+  AllocationResult allocate(size_t size) override;
+
+protected:
+  MemoryBlock *find_free_block(size_t size) override;
+};
+
+class BestFitAllocator : public MemoryAllocator {
+public:
+  BestFitAllocator();
+  AllocationResult allocate(size_t size) override;
+
+protected:
+  MemoryBlock *find_free_block(size_t size) override;
+};
+
+class WorstFitAllocator : public MemoryAllocator {
+public:
+  WorstFitAllocator();
+  AllocationResult allocate(size_t size) override;
+
+protected:
+  MemoryBlock *find_free_block(size_t size) override;
+};
+
 #endif

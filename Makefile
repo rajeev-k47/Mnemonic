@@ -8,7 +8,13 @@ BIN_DIR = .
 TARGET = $(BIN_DIR)/mnemonic
 
 SOURCES = $(SRC_DIR)/main.cpp \
-					$(SRC_DIR)/cli/command_parser.cpp
+					$(SRC_DIR)/cli/command_parser.cpp \
+          $(SRC_DIR)/allocator/memory_manager.cpp \
+          $(SRC_DIR)/allocator/first_fit.cpp \
+          $(SRC_DIR)/allocator/best_fit.cpp \
+          $(SRC_DIR)/allocator/worst_fit.cpp \
+					$(SRC_DIR)/cli/handlers.cpp
+
 
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 

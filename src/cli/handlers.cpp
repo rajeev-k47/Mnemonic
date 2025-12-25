@@ -17,7 +17,15 @@ void CLI::handle_init(const vector<string> &args) {
   }
 
   try {
-    size_t size = stoull(args[1]); // TODO implement malloc methods
+    size_t size = stoull(args[1]);
+    if (!allocator) {
+      allocator = new FirstFitAllocator();
+      cout << "I[Allocator] Default alloc: First Fit" << endl;
+    }
+
+    if (allocator->init(size)) {
+      initialized = true;
+    }
 
   } catch (const exception &e) {
     cerr << "E[Memory] Invalid size: " << args[1] << endl;
@@ -37,10 +45,24 @@ void CLI::handle_set_allocator(const vector<string> &args) {
 
   string type = args[1];
   transform(type.begin(), type.end(), type.begin(), ::tolower);
-  // TODO implement malloc methods
+
   if (allocator) {
     delete allocator;
     allocator = nullptr;
+  }
+
+  if (type == "first_fit") {
+    allocator = new FirstFitAllocator();
+    cout << "I[Allocator] Alloc: First Fit" << endl;
+  } else if (type == "best_fit") {
+    allocator = new BestFitAllocator();
+    cout << "I[Allocator] Alloc: Best Fit" << endl;
+  } else if (type == "worst_fit") {
+    allocator = new WorstFitAllocator();
+    cout << "I[Allocator] Alloc: Worst Fit" << endl;
+  } else {
+    cerr << "Unknown alloc: " << type << endl;
+    cerr << "Available:first_fit, best_fit, worst_fit" << endl;
   }
 }
 
@@ -56,7 +78,8 @@ void CLI::handle_malloc(const vector<string> &args) {
   }
 
   try {
-    size_t size = stoull(args[0]); // TODO implement malloc methods
+    size_t size = stoull(args[0]);
+    allocator->allocate(size);
   } catch (const exception &e) {
     cerr << "E[Memory] Invalid size: " << args[0] << endl;
   }
@@ -74,7 +97,8 @@ void CLI::handle_free(const vector<string> &args) {
   }
 
   try {
-    size_t block_id = stoull(args[0]); // TODO implement malloc methods
+    size_t block_id = stoull(args[0]);
+    allocator->deallocate(block_id);
   } catch (const exception &e) {
     cerr << "E[Memory] Invalid block ID: " << args[0] << endl;
   }
@@ -85,7 +109,6 @@ void CLI::handle_dump() {
     cerr << "W[CLI] Use 'init memory <size>' first." << endl;
     return;
   }
-  // TODO implement malloc methods
   allocator->dump_memory();
 }
 
