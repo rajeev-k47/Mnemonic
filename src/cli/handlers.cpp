@@ -18,13 +18,24 @@ void CLI::handle_init(const vector<string> &args) {
 
   try {
     size_t size = stoull(args[1]);
-    if (!allocator) {
-      allocator = new FirstFitAllocator();
-      cout << "I[Allocator] Default alloc: First Fit" << endl;
-    }
 
-    if (allocator->init(size)) {
-      initialized = true;
+    if (use_buddy) {
+      if (!buddy_allocator) {
+        buddy_allocator = new BuddyAllocator();
+        cout << "I[Allocator] Using alloc: Buddy" << endl;
+      }
+      if (buddy_allocator->init(size)) {
+        initialized = true;
+      }
+    } else {
+      if (!allocator) {
+        allocator = new FirstFitAllocator();
+        cout << "I[Allocator] Default alloc: First Fit" << endl;
+      }
+
+      if (allocator->init(size)) {
+        initialized = true;
+      }
     }
 
   } catch (const exception &e) {
@@ -50,6 +61,10 @@ void CLI::handle_set_allocator(const vector<string> &args) {
     delete allocator;
     allocator = nullptr;
   }
+  if (buddy_allocator) {
+    delete buddy_allocator;
+    buddy_allocator = nullptr;
+  }
 
   if (type == "first_fit") {
     allocator = new FirstFitAllocator();
@@ -60,6 +75,11 @@ void CLI::handle_set_allocator(const vector<string> &args) {
   } else if (type == "worst_fit") {
     allocator = new WorstFitAllocator();
     cout << "I[Allocator] Alloc: Worst Fit" << endl;
+  } else if (type == "buddy") {
+    buddy_allocator = new BuddyAllocator();
+    use_buddy = true;
+    cout << "I[Allocator] Alloc: Buddy System" << endl;
+    cout << "I[Allocator] Rounds sizes up to powers of two" << endl;
   } else {
     cerr << "Unknown alloc: " << type << endl;
     cerr << "Available:first_fit, best_fit, worst_fit" << endl;
@@ -79,7 +99,11 @@ void CLI::handle_malloc(const vector<string> &args) {
 
   try {
     size_t size = stoull(args[0]);
-    allocator->allocate(size);
+    if (use_buddy) {
+      buddy_allocator->allocate(size);
+    } else {
+      allocator->allocate(size);
+    }
   } catch (const exception &e) {
     cerr << "E[Memory] Invalid size: " << args[0] << endl;
   }
@@ -98,7 +122,11 @@ void CLI::handle_free(const vector<string> &args) {
 
   try {
     size_t block_id = stoull(args[0]);
-    allocator->deallocate(block_id);
+    if (use_buddy) {
+      buddy_allocator->deallocate(block_id);
+    } else {
+      allocator->deallocate(block_id);
+    }
   } catch (const exception &e) {
     cerr << "E[Memory] Invalid block ID: " << args[0] << endl;
   }
@@ -109,7 +137,12 @@ void CLI::handle_dump() {
     cerr << "W[CLI] Use 'init memory <size>' first." << endl;
     return;
   }
-  allocator->dump_memory();
+  if (use_buddy) {
+    buddy_allocator->dump_memory();
+    buddy_allocator->dump_free_lists();
+  } else {
+    allocator->dump_memory();
+  }
 }
 
 void CLI::handle_stats() {
@@ -118,10 +151,14 @@ void CLI::handle_stats() {
     return;
   }
 
-  AllocationStats stats = allocator->get_stats();
+  AllocationStats stats =
+      use_buddy ? buddy_allocator->get_stats() : allocator->get_stats();
 
   cout << "\n~~~~~~~Memory Statistics~~~~~~" << endl;
-  cout << "Allocator: " << allocator->get_allocator_name() << endl;
+  cout << "Allocator: "
+       << (use_buddy ? buddy_allocator->get_allocator_name()
+                     : allocator->get_allocator_name())
+       << endl;
   cout << "Total memory: " << stats.total_memory << " bytes" << endl;
   cout << "Used memory: " << stats.used_memory << " bytes" << endl;
   cout << "Free memory: " << stats.free_memory << " bytes" << endl;

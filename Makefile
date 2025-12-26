@@ -13,7 +13,8 @@ SOURCES = $(SRC_DIR)/main.cpp \
           $(SRC_DIR)/allocator/first_fit.cpp \
           $(SRC_DIR)/allocator/best_fit.cpp \
           $(SRC_DIR)/allocator/worst_fit.cpp \
-					$(SRC_DIR)/cli/handlers.cpp
+					$(SRC_DIR)/cli/handlers.cpp \
+          $(SRC_DIR)/buddy/buddy_allocator.cpp
 
 
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)

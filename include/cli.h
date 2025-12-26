@@ -2,6 +2,7 @@
 #define CLI_H
 
 #include "allocator.h"
+#include "buddy.h"
 #include <string>
 #include <vector>
 
@@ -43,7 +44,9 @@ public:
 
 private:
   MemoryAllocator *allocator;
+  BuddyAllocator *buddy_allocator;
   bool initialized;
+  bool use_buddy;
 
   void handle_init(const vector<string> &args);
   void handle_set_allocator(const vector<string> &args);

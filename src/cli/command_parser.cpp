@@ -5,8 +5,18 @@
 
 using namespace std;
 
-CLI::CLI() {}
-CLI::~CLI() {}
+CLI::CLI()
+    : allocator(nullptr), buddy_allocator(nullptr), use_buddy(false),
+      initialized(false) {}
+
+CLI::~CLI() {
+  if (allocator) {
+    delete allocator;
+  }
+  if (buddy_allocator) {
+    delete buddy_allocator;
+  }
+}
 
 vector<string> CommandParser::tokenize(const string &input) {
   vector<string> tokens;
