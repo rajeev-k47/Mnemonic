@@ -3,6 +3,7 @@
 
 #include "allocator.h"
 #include "buddy.h"
+#include "cache.h"
 #include <string>
 #include <vector>
 
@@ -48,12 +49,19 @@ private:
   bool initialized;
   bool use_buddy;
 
+  CacheHierarchy cache_hierarchy;
+  bool cache_initialized;
+
   void handle_init(const vector<string> &args);
   void handle_set_allocator(const vector<string> &args);
   void handle_malloc(const vector<string> &args);
   void handle_free(const vector<string> &args);
   void handle_dump();
   void handle_stats();
+
+  void handle_cache_init(const vector<string> &args);
+  void handle_cache_access(const vector<string> &args);
+  void handle_cache_stats();
 };
 
 #endif
