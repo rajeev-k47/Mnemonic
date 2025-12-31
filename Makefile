@@ -14,7 +14,9 @@ SOURCES = $(SRC_DIR)/main.cpp \
           $(SRC_DIR)/allocator/best_fit.cpp \
           $(SRC_DIR)/allocator/worst_fit.cpp \
 					$(SRC_DIR)/cli/handlers.cpp \
-          $(SRC_DIR)/buddy/buddy_allocator.cpp
+          $(SRC_DIR)/buddy/buddy_allocator.cpp \
+					$(SRC_DIR)/cache/cache.cpp \
+					$(SRC_DIR)/cache/cache_heirarchy.cpp
 
 
 OBJECTS = $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)

@@ -17,7 +17,10 @@ enum class CommandType {
   MALLOC,
   FREE,
   DUMP,
-  STATS
+  STATS,
+  CACHE_INIT,
+  CACHE_ACCESS,
+  CACHE_STATS
 };
 
 struct Command {

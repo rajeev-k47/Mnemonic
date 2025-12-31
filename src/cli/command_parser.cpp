@@ -1,5 +1,6 @@
 #include "../../include/cli.h"
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
@@ -47,6 +48,12 @@ CommandType CommandParser::get_command_type(const string &cmd) {
     return CommandType::DUMP;
   if (lower_cmd == "stats")
     return CommandType::STATS;
+  if (lower_cmd == "cache_init")
+    return CommandType::CACHE_INIT;
+  if (lower_cmd == "cache_access")
+    return CommandType::CACHE_ACCESS;
+  if (lower_cmd == "cache_stats")
+    return CommandType::CACHE_STATS;
 
   return CommandType::UNKNOWN;
 }
@@ -112,10 +119,102 @@ void CLI::execute_command(const Command &cmd) {
   case CommandType::STATS:
     handle_stats();
     break;
+  case CommandType::CACHE_INIT:
+    handle_cache_init(cmd.args);
+    break;
+  case CommandType::CACHE_ACCESS:
+    handle_cache_access(cmd.args);
+    break;
+  case CommandType::CACHE_STATS:
+    handle_cache_stats();
+    break;
+
   case CommandType::UNKNOWN:
     cerr << "[W] Unknown command" << endl;
     break;
   default:
     break;
   }
+}
+
+void CLI::handle_cache_init(const vector<string> &args) {
+  if (args.size() != 3 && args.size() != 6) {
+    cerr << "W[Cache] Use cache_init <L1_size> <L1_block> <L1_assoc> [L2_size "
+            "L2_block L2_assoc]"
+         << endl;
+    return;
+  }
+
+  try {
+    size_t l1_size = stoull(args[0]);
+    size_t l1_block = stoull(args[1]);
+    size_t l1_assoc = stoull(args[2]);
+
+    CacheConfig l1_cfg("L1", l1_size, l1_block, l1_assoc,
+                       ReplacementPolicy::FIFO);
+
+    vector<CacheConfig> cfgs;
+    cfgs.push_back(l1_cfg);
+
+    if (args.size() == 6) {
+      size_t l2_size = stoull(args[3]);
+      size_t l2_block = stoull(args[4]);
+      size_t l2_assoc = stoull(args[5]);
+      CacheConfig l2_cfg("L2", l2_size, l2_block, l2_assoc,
+                         ReplacementPolicy::FIFO);
+      cfgs.push_back(l2_cfg);
+    }
+
+    cache_hierarchy.set_levels(cfgs);
+    cache_initialized = true;
+
+    cout << "E[Cache] Cache init with " << cfgs.size() << " level(s)." << endl;
+  } catch (const exception &) {
+    cerr << "E[Cache] Invalid cache" << endl;
+  }
+}
+
+void CLI::handle_cache_access(const vector<string> &args) {
+  if (!cache_initialized) {
+    cerr << "W[Cache] Use 'cache_init' first." << endl;
+    return;
+  }
+
+  if (args.empty()) {
+    cerr << "W[Cache] Use cache_access <address>" << endl;
+    return;
+  }
+
+  try {
+    size_t address = 0;
+    if (args[0].rfind("0x", 0) == 0 || args[0].rfind("0X", 0) == 0) {
+      address = stoull(args[0], nullptr, 16);
+    } else {
+      address = stoull(args[0]);
+    }
+
+    cache_hierarchy.access(address);
+  } catch (const exception &) {
+    cerr << "E[Cache] Invalid address: " << args[0] << endl;
+  }
+}
+
+void CLI::handle_cache_stats() {
+  if (!cache_initialized) {
+    cerr << "E[Cache]  Use 'cache_init' first." << endl;
+    return;
+  }
+
+  auto stats_vec = cache_hierarchy.get_stats();
+
+  cout << "\n~~~~~~Cache Statistics~~~~~" << endl;
+  for (const auto &st : stats_vec) {
+    cout << st.level_name << ":" << endl;
+    cout << "Accesses:" << st.accesses << endl;
+    cout << "Hits:" << st.hits << endl;
+    cout << "Misses:" << st.misses << endl;
+    cout << "Hit ratio:" << fixed << setprecision(2) << st.hit_ratio() << "%"
+         << endl;
+  }
+  cout << endl;
 }
