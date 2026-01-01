@@ -4,6 +4,7 @@
 #include "allocator.h"
 #include "buddy.h"
 #include "cache.h"
+#include "vm.h"
 #include <string>
 #include <vector>
 
@@ -54,6 +55,9 @@ private:
 
   CacheHierarchy cache_hierarchy;
   bool cache_initialized;
+
+  VirtualMemoryManager vm_manager;
+  bool vm_initialized;
 
   void handle_init(const vector<string> &args);
   void handle_set_allocator(const vector<string> &args);
