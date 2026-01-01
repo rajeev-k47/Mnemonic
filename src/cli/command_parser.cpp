@@ -218,3 +218,93 @@ void CLI::handle_cache_stats() {
   }
   cout << endl;
 }
+
+void CLI::handle_vm_init(const std::vector<std::string> &args) {
+  if (args.size() < 3) {
+    std::cerr << "W[VM] Use vm_init <vsize> <page> <psize>" << std::endl;
+    return;
+  }
+
+  try {
+    size_t vsize = std::stoull(args[0]);
+    size_t page = std::stoull(args[1]);
+    size_t psize = std::stoull(args[2]);
+
+    if (vm_manager.init(vsize, page, psize, PageReplacementPolicy::FIFO)) {
+      vm_initialized = true;
+    }
+  } catch (const std::exception &) {
+    std::cerr << "E[VM] Invalid parameters" << std::endl;
+  }
+}
+
+void CLI::handle_vm_access(const std::vector<std::string> &args) {
+  if (!vm_initialized) {
+    std::cerr << "E[VM] Use 'vm_init' first." << std::endl;
+    return;
+  }
+
+  if (args.empty()) {
+    std::cerr << "W[VM] Use vm_access <vaddr>" << std::endl;
+    return;
+  }
+
+  try {
+    size_t vaddr = 0;
+    if (args[0].rfind("0x", 0) == 0 || args[0].rfind("0X", 0) == 0) {
+      vaddr = std::stoull(args[0], nullptr, 16);
+    } else {
+      vaddr = std::stoull(args[0]);
+    }
+
+    TranslationResult tr = vm_manager.access(vaddr);
+    if (!tr.success) {
+      std::cerr << "VM access error: " << tr.message << std::endl;
+      return;
+    }
+
+    std::cout << "VM access: VA=0x" << std::hex << vaddr
+              << " (page=" << std::dec << tr.virtual_page << ") -> PA=0x"
+              << std::hex << tr.physical_address << " (frame=" << std::dec
+              << tr.frame_index << ")";
+    if (tr.page_fault) {
+      std::cout << " [PAGE FAULT]";
+    } else {
+      std::cout << " [HIT]";
+    }
+    std::cout << std::endl;
+
+    if (cache_initialized) {
+      cache_hierarchy.access(tr.physical_address);
+    }
+
+  } catch (const std::exception &) {
+    std::cerr << "E[VM] Invalid virt. address: " << args[0] << std::endl;
+  }
+}
+
+void CLI::handle_vm_stats() {
+  if (!vm_initialized) {
+    std::cerr << "E[VM] Use 'vm_init' first." << std::endl;
+    return;
+  }
+
+  VMStats s = vm_manager.get_stats();
+
+  std::cout << "\n~~~~~~~~VM Statistics~~~~~~~~" << std::endl;
+  std::cout << "Virt. address space:" << s.virtual_size_bytes << " bytes"
+            << std::endl;
+  std::cout << "Physical memory (VM):" << s.physical_size_bytes << " bytes"
+            << std::endl;
+  std::cout << "Page size:" << s.page_size << " bytes" << std::endl;
+  std::cout << "Virtual pages:  " << s.num_virtual_pages << std::endl;
+  std::cout << "Physical frames:" << s.num_frames << std::endl;
+  std::cout << "VM accesses:" << s.accesses << std::endl;
+  std::cout << "Page hits:" << s.page_hits << std::endl;
+  std::cout << "Page faults:" << s.page_faults << std::endl;
+  std::cout << "Page hit rate:" << std::fixed << std::setprecision(2)
+            << s.hit_rate() << "%" << std::endl;
+  std::cout << "Page fault rate:       " << std::fixed << std::setprecision(2)
+            << s.fault_rate() << "%" << std::endl;
+  std::cout << std::endl;
+}

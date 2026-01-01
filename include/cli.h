@@ -69,6 +69,10 @@ private:
   void handle_cache_init(const vector<string> &args);
   void handle_cache_access(const vector<string> &args);
   void handle_cache_stats();
+
+  void handle_vm_init(const std::vector<std::string> &args);
+  void handle_vm_access(const std::vector<std::string> &args);
+  void handle_vm_stats();
 };
 
 #endif
