@@ -1,0 +1,16 @@
+set allocator best_fit
+init memory 2048
+malloc 256
+malloc 512
+malloc 128
+malloc 64
+dump
+stats
+free 2
+free 4
+dump
+malloc 100
+malloc 48
+dump
+stats
+exit

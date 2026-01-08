@@ -1,0 +1,19 @@
+init memory 1024
+malloc 100
+malloc 100
+malloc 100
+malloc 100
+malloc 100
+dump
+stats
+free 1
+free 3
+free 5
+dump
+stats
+malloc 80
+malloc 80
+malloc 80
+dump
+stats
+exit

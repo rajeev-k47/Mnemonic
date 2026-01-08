@@ -1,0 +1,10 @@
+cache_init 1024 64 1
+vm_init 4096 1024 2048
+vm_access 0
+vm_access 64
+vm_access 0
+vm_access 2048
+vm_access 64
+vm_stats
+cache_stats
+exit
