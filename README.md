@@ -67,6 +67,11 @@ make
 ./mnemonic
 ```
 
+### Testing
+For testing purpose refer to 
+[Testing Doc](docs/tests.md)
+
+
 ## Usage
 
 #### Initialize Memory
