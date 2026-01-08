@@ -234,7 +234,27 @@ void CLI::handle_cache_access(const vector<string> &args) {
       address = stoull(args[0]);
     }
 
+    auto stats_before = cache_hierarchy.get_stats();
     cache_hierarchy.access(address);
+    auto stats_after = cache_hierarchy.get_stats();
+    cout << "Address 0x" << hex << address << dec << " - ";
+
+    if (!stats_after.empty()) {
+      if (stats_after[0].hits > stats_before[0].hits) {
+        cout << "L1 HIT" << endl;
+      } else if (stats_after.size() > 1 &&
+                 stats_after[1].hits > stats_before[1].hits) {
+        cout << "L1 MISS, L2 HIT" << endl;
+      } else {
+        if (stats_after.size() > 1) {
+          cout << "L1 MISS, L2 MISS - Loaded from memory" << endl;
+        } else {
+          cout << "L1 MISS - Loaded from memory" << endl;
+        }
+      }
+    } else {
+      cout << "Cache not initialized" << endl;
+    }
   } catch (const exception &) {
     cerr << "E[Cache] Invalid address: " << args[0] << endl;
   }

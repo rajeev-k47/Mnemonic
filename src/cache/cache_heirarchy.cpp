@@ -10,21 +10,18 @@ void CacheHierarchy::set_levels(const vector<CacheConfig> &level_configs) {
   }
 }
 
-void CacheHierarchy::access(size_t address) {
+int CacheHierarchy::access(size_t address) {
   if (levels.empty()) {
-    return;
+    return -1;
   }
 
-  bool hit = false;
-  for (auto &level : levels) {
-    if (level.access(address)) {
-      hit = true;
-      break;
+  for (size_t i = 0; i < levels.size(); ++i) {
+    if (levels[i].access(address)) {
+      return static_cast<int>(i);
     }
   }
 
-  if (!hit) {
-  }
+  return -1;
 }
 
 vector<CacheStats> CacheHierarchy::get_stats() const {

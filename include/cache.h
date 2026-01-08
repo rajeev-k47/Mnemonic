@@ -79,7 +79,7 @@ public:
   CacheHierarchy();
 
   void set_levels(const vector<CacheConfig> &level_configs);
-  void access(size_t address);
+  int access(size_t address);
   vector<CacheStats> get_stats() const;
   void reset();
   bool empty() const { return levels.empty(); }
